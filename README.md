@@ -1,8 +1,8 @@
-# SOLS-Survivor
+# SOLS-Runner
 
 ## Overview
 
-SOLS-Survivor is a short narrative puzzle game inspired by the June Solstice, the annual astronomical event that marks the longest day of the year in the Northern Hemisphere and the shortest day in the Southern Hemisphere.
+SOLS-Runner is a short narrative puzzle game inspired by the June Solstice, the annual astronomical event that marks the longest day of the year in the Northern Hemisphere and the shortest day in the Southern Hemisphere.
 
 Players take on the role of Leo, a young runner who feels trapped in a repetitive and colorless routine. During an evening run, he discovers a mysterious cosmic crystal hidden beneath an old willow tree. The crystal challenges him with a series of puzzles centered around the concepts of light, balance, and seasonal change.
 
@@ -22,7 +22,7 @@ The game explores several ideas connected to the solstice:
 * Reflection and self-discovery
 * Finding balance during periods of uncertainty
 
-Rather than focusing solely on astronomy, SOLS-Survivor uses the solstice as a metaphor for change. Just as the Earth moves through cycles of light and darkness, people experience periods of struggle, growth, and renewal.
+Rather than focusing solely on astronomy, SOLS-Runner uses the solstice as a metaphor for change. Just as the Earth moves through cycles of light and darkness, people experience periods of struggle, growth, and renewal.
 
 ---
 
@@ -119,7 +119,7 @@ AI acted as a creative collaborator during development, helping transform an ini
 
 ## Message
 
-SOLS-Survivor is a reminder that change is a natural part of life.
+SOLS-Runner is a reminder that change is a natural part of life.
 
 Just as the Earth moves between seasons and the balance of light shifts throughout the year, people also move through periods of uncertainty, growth, and renewal.
 

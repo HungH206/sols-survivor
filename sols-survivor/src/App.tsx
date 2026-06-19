@@ -176,7 +176,7 @@ export default function App() {
             <span />
           </div>
           <div>
-            <span className="brand-title">SOLS-Survivor</span>
+            <span className="brand-title">SOLS-Runner</span>
             <span className="brand-subtitle">Solar Alchemy Run</span>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="app-footer">SOLS-SURVIVOR // PROCEDURAL INTERACTION SYSTEM</footer>
+      <footer className="app-footer">SOLS-RUNNER // PROCEDURAL INTERACTION SYSTEM</footer>
     </div>
   );
 }

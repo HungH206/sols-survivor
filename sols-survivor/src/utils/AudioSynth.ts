@@ -1,4 +1,4 @@
-// Procedural Web Audio Synthesizer for SOLS-Survivor
+// Procedural Web Audio Synthesizer for SOLS-Runner
 
 class AudioSynth {
   private ctx: AudioContext | null = null;

@@ -7,7 +7,7 @@ export class EndingScene extends Phaser.Scene {
 
   create() {
     this.add
-      .text(this.scale.width / 2, this.scale.height / 2, "SOLS-Survivor complete.", {
+      .text(this.scale.width / 2, this.scale.height / 2, "SOLS-Runner complete.", {
         fontFamily: "JetBrains Mono, monospace",
         fontSize: "24px",
         color: "#fef3c7",

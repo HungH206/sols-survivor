@@ -178,7 +178,7 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
                 Version 1.0: Active Run
               </span>
               <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight bg-gradient-to-tr from-emerald-400 via-teal-200 to-cyan-300 bg-clip-text text-transparent uppercase">
-                SOLS-Survivor
+                SOLS-Runner
               </h1>
               <p className="font-mono text-xs text-slate-400 tracking-wider">
                 Celestial Solar Challenges
@@ -520,7 +520,7 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
                 He turns back toward the road, sees the restored park, and celebrates.
               </p>
               <p className="border-l-2 border-amber-400 pl-4 py-0.5 font-display font-black text-amber-300 text-lg">
-                <TypingText text="SOLS-Survivor complete." speed={40} />
+                <TypingText text="SOLS-Runner complete." speed={40} />
               </p>
             </div>
 
