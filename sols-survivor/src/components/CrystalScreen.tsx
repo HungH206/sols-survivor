@@ -7,6 +7,7 @@ import { synth } from "../utils/AudioSynth";
 interface CrystalScreenProps {
   stage: GameStage;
   puzzle: Puzzle | null;
+  currentPuzzleIndex: number;
   history: string[];
   soundEnabled: boolean;
   onStartGame: () => void;
@@ -26,7 +27,8 @@ const TypingText: React.FC<{ text: string; speed?: number }> = ({ text, speed = 
     let index = 0;
     const interval = setInterval(() => {
       if (index < text.length) {
-        setDisplayedText((prev) => prev + text.charAt(index));
+        const nextCharacter = text.charAt(index);
+        setDisplayedText((prev) => prev + nextCharacter);
         index++;
       } else {
         clearInterval(interval);
@@ -42,6 +44,7 @@ const TypingText: React.FC<{ text: string; speed?: number }> = ({ text, speed = 
 export const CrystalScreen: React.FC<CrystalScreenProps> = ({
   stage,
   puzzle,
+  currentPuzzleIndex,
   history,
   soundEnabled,
   onStartGame,
@@ -105,6 +108,8 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
         return "Everything is covered in a heavy, lifeless gray cast. There has to be a path back to vibrancy.";
       case GameStage.INTRO:
         return "This light... it glows right through the thick mist. It responds to my presence.";
+      case GameStage.EXPLORE:
+        return "The next pod is ahead on the road. I need to keep moving forward.";
       case GameStage.PUZZLE_1:
         return "The crystal is asking about the Solstice. The peak of summer sun. Let me think...";
       case GameStage.RESULT_1:
@@ -119,8 +124,10 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
         return "The tropical boundaries. This must refer to the sun's highest celestial arcs.";
       case GameStage.RESULT_3:
         return "Incredible! Warm golden rays of sunlight are washing across the entire landscape.";
+      case GameStage.CLAIM_FINAL_LIGHT:
+        return "The crystal is almost complete. That mirror is holding the final one percent.";
       case GameStage.ENDING:
-        return "The gray world is completely gone. I realized nothing magical actually changed out here... I changed.";
+        return "I claimed the final one percent. The run is complete.";
       default:
         return "The crystal pulses. My reflection is waiting.";
     }
@@ -196,6 +203,50 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
           </div>
         )}
 
+        {/* EXPLORATION STAGE */}
+        {stage === GameStage.EXPLORE && (
+          <div className="space-y-6" id="stage-explore-layout">
+            <div className="space-y-1.5">
+              <div className="inline-block bg-cyan-400/15 border border-cyan-300/30 text-cyan-300 rounded-full px-3 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold">
+                FIELD RUN / QUESTION PODS ACTIVE
+              </div>
+              <h2 className="text-2xl font-display font-extrabold text-white">
+                Move Forward.
+              </h2>
+            </div>
+
+            <div className="space-y-3.5 text-slate-200 text-sm md:text-base leading-relaxed">
+              <p className="border-l-2 border-cyan-300 pl-4 py-1 italic text-slate-100">
+                <TypingText text="A question pod is waiting farther up the road." speed={20} />
+              </p>
+              <p>
+                Reach pod 1, then pod 2, then pod 3. Each correct answer releases sparks into the crystal and opens the next road segment.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {[0, 1, 2].map((index) => {
+                const isCurrent = index === currentPuzzleIndex;
+                const isSolved = index < currentPuzzleIndex;
+                return (
+                  <div
+                    key={index}
+                    className={`rounded-xl border px-3 py-3 text-center font-mono text-xs font-bold ${
+                      isSolved
+                        ? "border-emerald-300/40 bg-emerald-300/10 text-emerald-200"
+                        : isCurrent
+                        ? "border-cyan-300/50 bg-cyan-300/10 text-cyan-200"
+                        : "border-white/10 bg-white/5 text-slate-400"
+                    }`}
+                  >
+                    {isSolved ? "LIT" : "POD"} {index + 1}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* INTRO STAGE */}
         {stage === GameStage.INTRO && (
           <div className="space-y-6" id="stage-intro-layout">
@@ -238,7 +289,7 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
               </span>
             </div>
 
-            <h3 className="text-indigo-950 text-lg font-black mb-1.5 leading-tight font-display uppercase tracking-wider">
+            <h3 className="text-indigo-950 text-base md:text-lg font-black mb-1.5 leading-tight font-display uppercase tracking-wider">
               {puzzle.question}
             </h3>
             
@@ -247,7 +298,7 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
             </p>
 
             {/* Scrambled Word Tile Row */}
-            <div className="flex justify-center gap-2 md:gap-3 w-full max-w-sm py-4 px-2 bg-slate-50 rounded-2xl border border-slate-100 mb-4 relative overflow-hidden select-none">
+            <div className="flex justify-center gap-1.5 md:gap-2 w-full py-4 px-2 bg-slate-50 rounded-2xl border border-slate-100 mb-4 relative overflow-visible select-none">
               {cipherShift === 0 && (
                 <div className="absolute inset-0 bg-emerald-400/10 animate-pulse pointer-events-none" />
               )}
@@ -256,7 +307,7 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
                 const displayedChar = getShiftedChar(char, cipherShift);
                 return (
                   <div key={charIdx} className="flex flex-col items-center">
-                    <div className={`w-9 h-11 md:w-11 md:h-14 rounded-xl border-2 flex items-center justify-center font-black text-lg md:text-xl transition-all duration-300 shadow ${
+                    <div className={`w-8 h-10 md:w-9 md:h-12 rounded-xl border-2 flex items-center justify-center font-black text-base md:text-lg transition-all duration-300 shadow ${
                       cipherShift === 0
                         ? "bg-emerald-400 border-emerald-500 text-slate-950 scale-110 shadow-emerald-400/30 font-bold"
                         : "bg-white border-slate-200 text-indigo-950"
@@ -420,9 +471,32 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
               id="next-step-button"
               className="px-6 py-3 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-display font-bold hover:scale-[1.02] active:scale-95 shadow-[0_10px_20px_-5px_rgba(52,211,153,0.5)] transition-all flex items-center gap-2 justify-center uppercase text-xs tracking-wider"
             >
-              <span>{stage === GameStage.RESULT_3 ? "Gaze into the Light" : "Continue Journey"}</span>
+              <span>{stage === GameStage.RESULT_3 ? "Find the Mirror" : "Continue Journey"}</span>
               <ArrowRight className="w-4 h-4 text-slate-950" />
             </button>
+          </div>
+        )}
+
+        {/* FINAL CLAIM STAGE */}
+        {stage === GameStage.CLAIM_FINAL_LIGHT && (
+          <div className="space-y-6" id="stage-final-claim-layout">
+            <div className="space-y-1.5">
+              <div className="inline-block bg-amber-400/20 border border-amber-400/30 text-amber-300 px-3.5 py-0.5 text-[10px] font-mono uppercase tracking-widest rounded-full font-bold">
+                FINAL 1% / MIRROR CLAIM
+              </div>
+              <h3 className="text-3xl font-display font-extrabold text-white">
+                Claim the Last Light.
+              </h3>
+            </div>
+
+            <div className="space-y-3.5 max-w-xl mx-auto text-slate-200 text-sm leading-relaxed bg-white/5 p-5 rounded-2xl border border-white/5">
+              <p className="border-l-2 border-amber-300 pl-4 py-0.5">
+                The crystal is bright, but one last shimmer is missing.
+              </p>
+              <p className="border-l-2 border-cyan-300 pl-4 py-0.5 italic text-slate-300">
+                A mirror has appeared in the road. Reach it to claim the final 1%.
+              </p>
+            </div>
           </div>
         )}
 
@@ -440,13 +514,13 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
 
             <div className="space-y-3.5 max-w-xl mx-auto text-slate-200 text-sm leading-relaxed bg-white/5 p-5 rounded-2xl border border-white/5">
               <p className="border-l-2 border-emerald-400 pl-4 py-0.5">
-                The cold gray mist has fully vanished from Greenwood Park. High sun washes over beautiful green meadows.
+                Leo steps into the mirror light and claims the final 1%.
               </p>
               <p className="border-l-2 border-cyan-400 pl-4 py-0.5 italic text-slate-300">
-                You realize nothing magical actually changed.
+                He turns back toward the road, sees the restored park, and celebrates.
               </p>
               <p className="border-l-2 border-amber-400 pl-4 py-0.5 font-display font-black text-amber-300 text-lg">
-                <TypingText text="You changed." speed={40} />
+                <TypingText text="SOLS-Survivor complete." speed={40} />
               </p>
             </div>
 

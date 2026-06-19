@@ -215,6 +215,95 @@ button {
   align-items: stretch;
 }
 
+.focus-game-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.left-panel-layout {
+  display: grid;
+  grid-template-columns: minmax(460px, 0.58fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.game-stage {
+  position: relative;
+  min-height: min(760px, calc(100vh - 170px));
+  height: min(760px, calc(100vh - 170px));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(4, 10, 21, 0.72);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.game-stage .scene-column {
+  min-height: 0;
+  height: 100%;
+}
+
+.game-message-panel {
+  position: relative;
+  z-index: 1;
+  left: auto;
+  width: 100%;
+  max-height: min(760px, calc(100vh - 170px));
+  margin: 0;
+  transform: none;
+  pointer-events: auto;
+}
+
+.game-message-panel #crystal-screen-narrative-panel {
+  height: 100%;
+  min-height: min(760px, calc(100vh - 170px));
+  max-height: min(760px, calc(100vh - 170px));
+  overflow: auto;
+  padding: 22px;
+  border-radius: 8px;
+  background: rgba(8, 13, 30, 0.86);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+}
+
+.game-message-panel #crystal-screen-narrative-panel > div:first-child {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.game-message-panel #crystal-screen-narrative-panel h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.game-message-panel #crystal-screen-narrative-panel h2,
+.game-message-panel #crystal-screen-narrative-panel h3 {
+  font-size: clamp(1.3rem, 2.6vw, 2rem);
+}
+
+.game-message-panel #character-dialogue-footer,
+.game-message-panel #game-history-collapsible {
+  display: none;
+}
+
+.game-message-panel #stage-explore-layout,
+.game-message-panel #stage-final-claim-layout,
+.game-message-panel #stage-result-layout,
+.game-message-panel #stage-ending-layout,
+.game-message-panel #stage-title-layout {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.game-message-panel #stage-puzzle-layout,
+.game-message-panel #stage-puzzle-caesar-layout {
+  padding: 22px;
+  border-radius: 8px;
+}
+
+.game-message-panel #stage-puzzle-caesar-layout {
+  max-width: 100%;
+}
+
 .scene-column,
 .control-column {
   min-height: 520px;
@@ -731,6 +820,29 @@ button {
 
   .game-layout {
     grid-template-columns: 1fr;
+  }
+
+  .left-panel-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-stage {
+    min-height: 520px;
+    height: max(520px, calc(100vh - 420px));
+  }
+
+  .game-message-panel {
+    width: calc(100% - 20px);
+    max-height: 260px;
+    margin: 0 auto;
+  }
+
+  .game-message-panel #crystal-screen-narrative-panel {
+    height: auto;
+    min-height: 0;
+    max-height: 260px;
+    padding: 12px;
   }
 
   .scene-column,

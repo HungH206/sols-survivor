@@ -31,7 +31,7 @@ export default function App() {
 
   const handleStartGame = () => {
     synth.playClick();
-    setStage(GameStage.INTRO);
+    setStage(GameStage.EXPLORE);
     setHistory(["Leo began running through Greenwood Park on a gloomy, windless gray day."]);
   };
 
@@ -41,6 +41,35 @@ export default function App() {
     setHistory((prev) => [
       ...prev,
       "Leo stopped and examined a pulsing octagonal crystal floating above the pathway.",
+    ]);
+  };
+
+  const handleQuestionPodReached = (podIndex: number) => {
+    if (stage !== GameStage.EXPLORE || podIndex !== currentPuzzleIndex) return;
+
+    synth.playClick();
+    setStage(
+      podIndex === 0
+        ? GameStage.PUZZLE_1
+        : podIndex === 1
+          ? GameStage.PUZZLE_2
+          : GameStage.PUZZLE_3
+    );
+    setHistory((prev) => [
+      ...prev,
+      `Leo reached question pod ${podIndex + 1}. The crystal projects a new challenge.`,
+    ]);
+  };
+
+  const handleMirrorReached = () => {
+    if (stage !== GameStage.CLAIM_FINAL_LIGHT) return;
+
+    synth.playSuccessSound();
+    setStage(GameStage.ENDING);
+    setHistory((prev) => [
+      ...prev,
+      "Leo stepped into the mirror light and claimed the final 1%.",
+      "He turned back toward the restored park and celebrated the completed run.",
     ]);
   };
 
@@ -87,16 +116,16 @@ export default function App() {
     synth.playClick();
     if (currentPuzzleIndex === 0) {
       setCurrentPuzzleIndex(1);
-      setStage(GameStage.PUZZLE_2);
+      setStage(GameStage.EXPLORE);
     } else if (currentPuzzleIndex === 1) {
       setCurrentPuzzleIndex(2);
-      setStage(GameStage.PUZZLE_3);
+      setStage(GameStage.EXPLORE);
     } else {
-      setStage(GameStage.ENDING);
+      setCurrentPuzzleIndex(3);
+      setStage(GameStage.CLAIM_FINAL_LIGHT);
       setHistory((prev) => [
         ...prev,
-        "The challenges are complete. A sacred mirror emerges as the gray world transforms.",
-        "Leo realizes the magic was not changing the world. It was learning to see it.",
+        "The three question pods are complete. A mirror appears on the road, holding the final 1%.",
       ]);
     }
   };
@@ -156,20 +185,12 @@ export default function App() {
         </div>
       </header>
 
-      <main className="game-layout">
-        <section className="scene-column">
-          <GameCanvas
-            stage={stage}
-            grassColorLevel={grassColorLevel}
-            skyColorLevel={skyColorLevel}
-            sunColorLevel={sunColorLevel}
-          />
-        </section>
-
-        <section className="control-column">
+      <main className="game-layout focus-game-layout left-panel-layout">
+        <section className="game-message-panel">
           <CrystalScreen
             stage={stage}
             puzzle={currentPuzzle}
+            currentPuzzleIndex={currentPuzzleIndex}
             history={history}
             soundEnabled={soundEnabled}
             onStartGame={handleStartGame}
@@ -179,6 +200,20 @@ export default function App() {
             onRestart={handleRestart}
             onToggleSound={handleToggleSound}
           />
+        </section>
+
+        <section className="game-stage">
+          <div className="scene-column">
+            <GameCanvas
+              stage={stage}
+              currentPuzzleIndex={currentPuzzleIndex}
+              grassColorLevel={grassColorLevel}
+              skyColorLevel={skyColorLevel}
+              sunColorLevel={sunColorLevel}
+              onQuestionPodReached={handleQuestionPodReached}
+              onMirrorReached={handleMirrorReached}
+            />
+          </div>
         </section>
       </main>
 
