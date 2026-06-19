@@ -3,6 +3,7 @@ import { GameCanvas } from "./components/GameCanvas";
 import { CrystalScreen } from "./components/CrystalScreen";
 import { GameStage, PUZZLES } from "./types";
 import type { Choice } from "./types";
+import type { AnswerFeedback } from "./game/types";
 import { synth } from "./utils/AudioSynth";
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
   const [sunColorLevel, setSunColorLevel] = useState(0);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [history, setHistory] = useState<string[]>([]);
+  const [answerFeedback, setAnswerFeedback] = useState<AnswerFeedback | null>(null);
 
   useEffect(() => {
     if (soundEnabled && stage !== GameStage.TITLE) {
@@ -78,6 +80,7 @@ export default function App() {
 
     if (!choice.isCorrect) {
       synth.playFailureSound();
+      setAnswerFeedback((prev) => ({ id: (prev?.id ?? 0) + 1, type: "wrong" }));
       setHistory((prev) => [
         ...prev,
         `${choice.letter}. ${choice.text} makes the crystal dim. Leo steadies his breath and tries again.`,
@@ -87,6 +90,7 @@ export default function App() {
 
     if (currentPuzzleIndex === 0) {
       synth.playCrystalChime(currentPuzzleIndex);
+      setAnswerFeedback((prev) => ({ id: (prev?.id ?? 0) + 1, type: "correct" }));
       setGrassColorLevel(1);
       setStage(GameStage.RESULT_1);
       setHistory((prev) => [
@@ -95,6 +99,7 @@ export default function App() {
       ]);
     } else if (currentPuzzleIndex === 1) {
       synth.playCrystalChime(currentPuzzleIndex);
+      setAnswerFeedback((prev) => ({ id: (prev?.id ?? 0) + 1, type: "correct" }));
       setSkyColorLevel(1);
       setStage(GameStage.RESULT_2);
       setHistory((prev) => [
@@ -103,6 +108,7 @@ export default function App() {
       ]);
     } else {
       synth.playSuccessSound();
+      setAnswerFeedback((prev) => ({ id: (prev?.id ?? 0) + 1, type: "correct" }));
       setSunColorLevel(1);
       setStage(GameStage.RESULT_3);
       setHistory((prev) => [
@@ -209,8 +215,9 @@ export default function App() {
               currentPuzzleIndex={currentPuzzleIndex}
               grassColorLevel={grassColorLevel}
               skyColorLevel={skyColorLevel}
-              sunColorLevel={sunColorLevel}
-              onQuestionPodReached={handleQuestionPodReached}
+            sunColorLevel={sunColorLevel}
+            answerFeedback={answerFeedback}
+            onQuestionPodReached={handleQuestionPodReached}
               onMirrorReached={handleMirrorReached}
             />
           </div>
