@@ -17,6 +17,22 @@ export default function App() {
   const [answerFeedback, setAnswerFeedback] = useState<AnswerFeedback | null>(null);
 
   useEffect(() => {
+    const unlockAudio = () => {
+      synth.unlock();
+    };
+
+    window.addEventListener("pointerdown", unlockAudio, { once: true });
+    window.addEventListener("touchstart", unlockAudio, { once: true });
+    window.addEventListener("keydown", unlockAudio, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("touchstart", unlockAudio);
+      window.removeEventListener("keydown", unlockAudio);
+    };
+  }, []);
+
+  useEffect(() => {
     if (soundEnabled && stage !== GameStage.TITLE) {
       const activeRestorationProgress = (grassColorLevel + skyColorLevel + sunColorLevel) / 3;
       synth.startBackgroundDrone(activeRestorationProgress);
