@@ -157,26 +157,26 @@ The production server serves the built Vite app, exposes `/api/crystal` for Gemi
 
 ## Deployment: Google Cloud Run
 
-The app is ready for Google Cloud Run deployment. The included `Dockerfile` builds the Vite/React game, copies the production assets into a Node runtime image, and starts `server.mjs` on the Cloud Run-provided `PORT`.
+The app is ready for Google Cloud Run deployment. The root `package.json` forwards Cloud Buildpack commands into the `sols-survivor` app directory, where the Vite/React game is built and `server.mjs` starts on the Cloud Run-provided `PORT`.
 
-Deploy from the app directory:
+Deploy from the repository root:
 
 ```bash
-cd sols-survivor
 gcloud run deploy sols-runner \
   --source . \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=your_api_key_here
+  --set-secrets GEMINI_API_KEY=gemini-api-key:latest
 ```
 
 Cloud Run deployment notes:
 
 * `PORT` is provided automatically by Cloud Run.
-* `GEMINI_API_KEY` must be configured as an environment variable or secret.
+* `GEMINI_API_KEY` should be configured from Secret Manager with `--set-secrets`.
 * `/healthz` returns `ok` and can be used as a health check endpoint.
-* Static game assets are served from `dist` after `npm run build`.
+* Static game assets are served from `sols-survivor/dist` after `npm run build`.
 * Gemini requests are handled server-side so the API key is not shipped to the browser.
+* If deploying from inside the nested app directory instead, run the same command after `cd sols-survivor`.
 
 ---
 

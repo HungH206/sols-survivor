@@ -1,4 +1,11 @@
 {
+  "name": "sols-runner-root",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix sols-survivor ci && npm --prefix sols-survivor run build",
+    "gcp-build": "npm run build",
+    "start": "node sols-survivor/server.mjs"
+  },
   "dependencies": {
     "phaser": "^4.1.0"
   }
