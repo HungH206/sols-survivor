@@ -24,6 +24,7 @@ export interface Puzzle {
   question: string;
   choices: Choice[];
   correctFeedback: string;
+  crystalExplanation: string;
 }
 
 export interface GameState {
@@ -47,6 +48,8 @@ export const PUZZLES: Puzzle[] = [
       { id: "p1-c", text: "Eclipse", letter: "C", isCorrect: false },
     ],
     correctFeedback: "The grass becomes greener.",
+    crystalExplanation:
+      "The Crystal hums softly. Solstice means the Sun reaches its greatest path through the sky, giving one hemisphere its longest day or longest night. Equinox is different: day and night are nearly balanced. Eclipse means one space object blocks another's light. As sunlight stretches across the season, Greenwood Park remembers how to grow.",
   },
   {
     id: 2,
@@ -57,6 +60,8 @@ export const PUZZLES: Puzzle[] = [
       { id: "p2-c", text: "Equinox", letter: "C", isCorrect: true },
     ],
     correctFeedback: "The sky brightens.",
+    crystalExplanation:
+      "The Crystal turns like a balanced wheel. Equinox is correct because day and night are nearly equal as the Sun crosses Earth's equator. A solstice brings the year's longest or shortest daylight. An eclipse is a shadow alignment, not a season marker. Balance in the heavens clears balance in the sky.",
   },
   {
     id: 3,
@@ -67,5 +72,7 @@ export const PUZZLES: Puzzle[] = [
       { id: "p3-c", text: "Pegasus", letter: "C", isCorrect: false },
     ],
     correctFeedback: "A golden energy radiates. The full solar balance is restored.",
+    crystalExplanation:
+      "The Crystal flashes gold. Cancer is one of Earth's tropical boundaries, marking the farthest north the direct Sun appears at noon. Orion and Pegasus are constellations, patterns of stars, not latitude lines on Earth. Knowing the Sun's path helps Leo place light, seasons, and growth back into harmony.",
   },
 ];

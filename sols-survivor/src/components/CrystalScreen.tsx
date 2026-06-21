@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { GameStage } from "../types";
 import type { Choice, Puzzle } from "../types";
-import { Sparkles, ArrowRight, RotateCcw, Volume2, VolumeX, History, Check, ArrowLeft, Lock } from "lucide-react";
+import {
+  Sparkles,
+  ArrowRight,
+  RotateCcw,
+  Volume2,
+  VolumeX,
+  History,
+  Check,
+  ArrowLeft,
+  Lock,
+  MessageCircle,
+} from "lucide-react";
 import { synth } from "../utils/AudioSynth";
+import { askGeminiCrystal } from "../services/geminiCrystal";
 
 interface CrystalScreenProps {
   stage: GameStage;
@@ -57,6 +69,10 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [showWrongFeedback, setShowWrongFeedback] = useState(false);
   const [cipherShift, setCipherShift] = useState<number>(13); // ROT13 starting offset
+  const [showCrystalExplanation, setShowCrystalExplanation] = useState(false);
+  const [crystalExplanationText, setCrystalExplanationText] = useState<string | null>(null);
+  const [isCrystalThinking, setIsCrystalThinking] = useState(false);
+  const [usedCrystalFallback, setUsedCrystalFallback] = useState(false);
 
   // Reset Caesar Cipher offset every time player enters puzzle 2
   useEffect(() => {
@@ -64,6 +80,13 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
       setCipherShift(13);
     }
   }, [stage]);
+
+  useEffect(() => {
+    setShowCrystalExplanation(false);
+    setCrystalExplanationText(null);
+    setIsCrystalThinking(false);
+    setUsedCrystalFallback(false);
+  }, [stage, puzzle?.id]);
 
   const ALPHABET_STR = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -82,6 +105,33 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
       if (next < 0) next += 26;
       return next;
     });
+  };
+
+  const handleAskCrystal = async () => {
+    if (!puzzle || isCrystalThinking) return;
+
+    synth.playClick();
+    setShowCrystalExplanation(true);
+    setCrystalExplanationText(null);
+    setIsCrystalThinking(true);
+    setUsedCrystalFallback(false);
+
+    try {
+      const explanation = await askGeminiCrystal(puzzle);
+      setCrystalExplanationText(explanation);
+    } catch (error) {
+      console.warn(error);
+      if (import.meta.env.VITE_DISABLE_CRYSTAL_FALLBACK === "true") {
+        const message = error instanceof Error ? error.message : "Unknown Gemini error";
+        setCrystalExplanationText(`Gemini request failed: ${message}`);
+        setUsedCrystalFallback(false);
+      } else {
+        setCrystalExplanationText(puzzle.crystalExplanation);
+        setUsedCrystalFallback(true);
+      }
+    } finally {
+      setIsCrystalThinking(false);
+    }
   };
 
   // Helper to handle answer selections with state protection
@@ -463,17 +513,61 @@ export const CrystalScreen: React.FC<CrystalScreenProps> = ({
               </p>
             </div>
 
-            <button
-              onClick={() => {
-                setSelectedLetter(null);
-                onNextPuzzle();
-              }}
-              id="next-step-button"
-              className="px-6 py-3 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-display font-bold hover:scale-[1.02] active:scale-95 shadow-[0_10px_20px_-5px_rgba(52,211,153,0.5)] transition-all flex items-center gap-2 justify-center uppercase text-xs tracking-wider"
-            >
-              <span>{stage === GameStage.RESULT_3 ? "Find the Mirror" : "Continue Journey"}</span>
-              <ArrowRight className="w-4 h-4 text-slate-950" />
-            </button>
+            {showCrystalExplanation ? (
+              <div
+                className="p-5 bg-cyan-300/10 rounded-2xl border border-cyan-300/25 shadow-[0_0_30px_rgba(34,211,238,0.08)]"
+                id="crystal-ai-explanation"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageCircle className="w-4 h-4 text-cyan-300" />
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-200 font-bold">
+                    Crystal Tutor // {usedCrystalFallback ? "Local Fallback Lesson" : "Gemini 2.5 Flash"}
+                  </span>
+                </div>
+                <p className="text-sm md:text-base leading-relaxed text-slate-100">
+                  {isCrystalThinking ? (
+                    <TypingText text="The Crystal is thinking through the light..." speed={20} />
+                  ) : (
+                    <TypingText text={crystalExplanationText ?? puzzle.crystalExplanation} speed={14} />
+                  )}
+                </p>
+              </div>
+            ) : (
+              <div className="p-5 bg-cyan-300/10 rounded-2xl border border-cyan-300/20">
+                <p className="text-cyan-100 text-sm md:text-base leading-relaxed">
+                  The Crystal glows brighter and waits.
+                </p>
+                <p className="text-cyan-300 font-display font-bold text-lg mt-1">
+                  Ask me why.
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              {!showCrystalExplanation && (
+                <button
+                  onClick={handleAskCrystal}
+                  id="ask-crystal-button"
+                  className="px-6 py-3 rounded-full bg-cyan-300 hover:bg-cyan-200 text-slate-950 font-display font-bold hover:scale-[1.02] active:scale-95 shadow-[0_10px_20px_-5px_rgba(34,211,238,0.45)] transition-all flex items-center gap-2 justify-center uppercase text-xs tracking-wider"
+                >
+                  <MessageCircle className="w-4 h-4 text-slate-950" />
+                  <span>Ask the Crystal</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => {
+                  setSelectedLetter(null);
+                  setShowCrystalExplanation(false);
+                  onNextPuzzle();
+                }}
+                id="next-step-button"
+                className="px-6 py-3 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-display font-bold hover:scale-[1.02] active:scale-95 shadow-[0_10px_20px_-5px_rgba(52,211,153,0.5)] transition-all flex items-center gap-2 justify-center uppercase text-xs tracking-wider"
+              >
+                <span>{stage === GameStage.RESULT_3 ? "Find the Mirror" : "Continue Journey"}</span>
+                <ArrowRight className="w-4 h-4 text-slate-950" />
+              </button>
+            </div>
           </div>
         )}
 
