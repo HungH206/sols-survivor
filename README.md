@@ -73,6 +73,27 @@ These topics are woven into the gameplay to encourage curiosity while supporting
 
 ---
 
+## Gemini Crystal AI Tutor
+
+SOLS-Runner now includes the Gemini Crystal AI Tutor, an in-game learning assistant powered by Gemini 2.5 Flash.
+
+When players solve a puzzle, the Crystal Tutor can generate a short magical explanation that:
+
+* Explains why the correct answer is right
+* Clarifies why the other answer choices are incorrect
+* Connects the lesson back to light, seasons, balance, or growth
+
+The browser calls the local `/api/crystal` endpoint, and the Node server securely forwards the request to the Gemini API. This keeps the Gemini API key on the server instead of exposing it in the client bundle. If the AI request fails, the game falls back to the built-in lesson text so the puzzle flow remains playable.
+
+Runtime configuration:
+
+* Model: `gemini-2.5-flash`
+* API route: `/api/crystal`
+* Required environment variable: `GEMINI_API_KEY`
+* Local fallback support: built-in puzzle explanations
+
+---
+
 ## Development Process
 
 This project was intentionally designed with a small scope to ensure completion within a short game jam timeline.
@@ -88,7 +109,7 @@ The primary development goals were:
 
 ## Google AI Usage
 
-Google AI Studio was used throughout the development process to assist with:
+Google AI Studio and Gemini were used throughout the development process to assist with:
 
 * Story brainstorming
 * Character development
@@ -96,8 +117,66 @@ Google AI Studio was used throughout the development process to assist with:
 * Narrative refinement
 * Game design planning
 * Scope reduction and iteration
+* Gemini Crystal AI Tutor lesson generation
 
 AI acted as a creative collaborator during development, helping transform an initial concept into a focused and achievable game jam project.
+
+---
+
+## Local Development
+
+The playable app lives in the `sols-survivor` directory.
+
+```bash
+cd sols-survivor
+npm install
+```
+
+Create a local `.env` file with your Gemini API key:
+
+```bash
+GEMINI_API_KEY=your_api_key_here
+```
+
+Start the local development server:
+
+```bash
+npm run dev
+```
+
+Build and run the production server locally:
+
+```bash
+npm run build
+npm start
+```
+
+The production server serves the built Vite app, exposes `/api/crystal` for Gemini Crystal Tutor requests, and provides `/healthz` for deployment health checks.
+
+---
+
+## Deployment: Google Cloud Run
+
+The app is ready for Google Cloud Run deployment. The included `Dockerfile` builds the Vite/React game, copies the production assets into a Node runtime image, and starts `server.mjs` on the Cloud Run-provided `PORT`.
+
+Deploy from the app directory:
+
+```bash
+cd sols-survivor
+gcloud run deploy sols-runner \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars GEMINI_API_KEY=your_api_key_here
+```
+
+Cloud Run deployment notes:
+
+* `PORT` is provided automatically by Cloud Run.
+* `GEMINI_API_KEY` must be configured as an environment variable or secret.
+* `/healthz` returns `ok` and can be used as a health check endpoint.
+* Static game assets are served from `dist` after `npm run build`.
+* Gemini requests are handled server-side so the API key is not shipped to the browser.
 
 ---
 
@@ -111,9 +190,13 @@ AI acted as a creative collaborator during development, helping transform an ini
 ## Technologies
 
 * Game Engine: Phaser.js
-* Programming Language: JavaScript, TypeScript
-* Design Tools: Figma
-* AI Assistance: Google AI Studio
+* Frontend: React, Vite
+* Programming Language: TypeScript, JavaScript
+* Styling: Tailwind CSS
+* Runtime Server: Node.js
+* AI Tutor: Gemini Crystal AI Tutor using Gemini 2.5 Flash
+* AI Assistance: Google AI Studio, Gemini
+* Deployment: Google Cloud Run
 
 ---
 
